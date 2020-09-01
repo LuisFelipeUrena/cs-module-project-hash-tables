@@ -7,6 +7,62 @@ class HashTableEntry:
         self.value = value
         self.next = None
 
+class LinkedHash:
+    def __init__(self):
+        self.head = None
+    
+    
+    def add_to_head(self,key, value):
+        node = HashTableEntry(key,value)
+        if self.head is None:
+            self.head = node
+        else:
+            node.next = self.head
+            self.head = node 
+    
+    def find(self, key):
+        start = self.head
+        while (start is not None):
+            if start.key == key:
+                return (start.key, start.value)
+            start = start.next
+        
+        return None    
+    
+    def delete(self, value):
+        cur = self.head
+        if cur.value == value:
+            self.head = cur.next
+            return cur
+        prev = cur
+        cur = cur.next
+
+        while cur is not None:
+            if cur.value == value:
+                prev.next = cur.next
+                return cur
+            else:
+                prev = cur
+                cur = cur.next
+        return None
+    
+    def count(self):
+        total = 0
+        start = self.head
+        while (start.value is not None):
+            total += 1
+            start = start.next
+        return total                
+
+
+
+
+
+
+
+
+
+
 
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
@@ -22,7 +78,8 @@ class HashTable:
 
     def __init__(self, capacity):
         self.capacity = capacity
-        self.storage = [None] * capacity
+        self.storage = [None] * self.capacity
+        
 
 
     def get_num_slots(self):
@@ -46,6 +103,19 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # load_fact = total of items in the table / by the capacity
+        # get the amount of items in each slot
+        load_f = 0
+        while (self.storage[i] is not None):
+            load_f += self.storage[i].count()
+
+        result = load_f / self.capacity
+
+        if result > 0.77:
+            return self.resize((len(self.storage)* 2))
+        
+
+
 
 
     def fnv1(self, key):
@@ -87,9 +157,20 @@ class HashTable:
 
         Implement this.
         """
+        
         position = self.hash_index(key)
+        
+        if (self.storage[position] is not None):
+            # if there is a linkedHash on this index already...
+             dup = self.storage[position]
+             dup.add_to_head(key,value)
+        
+        else:     
+            # otherwise just add a LinkedHash to that slot
+            item = LinkedHash()
+            item.add_to_head(key,value)
 
-        self.storage[position] = value
+            self.storage[position] = item
         
 
 
@@ -101,12 +182,21 @@ class HashTable:
 
         Implement this.
         """
+        import warnings
         position = self.hash_index(key)
-
-        if self.storage[position] is not None:
-            self.storage[position] = None
+        target = self.storage[position]
+        if (target.find(key) is not None):
+            val = target.find(key)[1]
+            target.delete(val)
         else:
-            print('value not found in the table')
+            warnings.warn('Key not Found')
+
+        # position = self.hash_index(key)
+
+        # if self.storage[position] is not None:
+        #     self.storage[position] = None
+        # else:
+        #     print('value not found in the table')
 
 
     def get(self, key):
@@ -118,7 +208,12 @@ class HashTable:
         Implement this.
         """
         position = self.hash_index(key)
-        return self.storage[position]
+        target = self.storage[position]
+        if (target.find(key) is not None):
+            return target.find(key)[1]
+        else:
+            return None    
+        
 
 
     def resize(self, new_capacity):
@@ -128,9 +223,25 @@ class HashTable:
 
         Implement this.
         """
-        self.capacity = new_capacity
-        for i in range(len(self.storage)):
-            self.hash_index(i)
+        new_table = [None] * new_capacity
+        for i,v in enumerate(self.storage):
+            if (v is not None):
+                start = v.head
+                while (start is not None):
+                    new_pos = self.hash_index(start.key)
+                    node = LinkedHash()
+                    new_table[new_pos] = node.add_to_head(start.key,start.value)
+                    start = start.next
+                self.storage = new_table
+            else:
+                return       
+
+        
+        # self.capacity = new_capacity
+        # for i in range(len(self.storage)):
+        # #    new_hash = self.hash_index(self.storage[i])
+        # #    self.storage[i]
+
         
 
 
