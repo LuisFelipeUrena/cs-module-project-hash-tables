@@ -1,6 +1,28 @@
 def word_count(s):
-    # Your code here
+    d = {}
+    # words = s.split()
+    # ignore = ['"',':',';',',','.','-','+','=',
+    # '/',"\n",'|','[',']','{','}','(',')','*','^','&']
+    ignore = '":;,.-+=/\\|[]{}()*^&'
+    for i in ignore:
+        if i in s:
+            s = s.replace(i,'')
+        else:
+            continue    
+    words = s.split()        
+    
+    for w in words:
+        # if w.isspace():
+        #     continue
+        
+        w = w.lower()
+        if w in d:
+            d[w] += 1
+        else:
+            d[w] = 1
+    return d          
 
+    
 
 
 if __name__ == "__main__":

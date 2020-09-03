@@ -1,5 +1,24 @@
 def no_dups(s):
-    # Your code here
+    # identify each word in the string
+    # count each word
+    # add it to the dictionary
+    # print out a string with each individual word
+    d = {}
+    s = s.split()
+    for i in s:
+        if i in d:
+            d[i] += 1
+        else:
+            d[i] = 1
+    word = ' '        
+    # for key,value in d.items():
+    #    word = word.join(str(key))
+    return word.join(d.keys()) 
+
+        
+
+
+
 
 
 
